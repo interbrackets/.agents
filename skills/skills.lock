@@ -1,0 +1,247 @@
+{
+  "lockfileVersion": 2,
+  "updatedAt": "2026-11-01",
+  "location": "Real skill folders live in ~/.agents/skills. ~/.claude/skills holds one junction per skill, made by ~/.agents/link-skills.ps1, plus the app-managed synced and .trash folders, which are not registered here.",
+  "packs": {
+    "core": "Workflow skills that apply to every project",
+    "web": "Web development: frontend and backend",
+    "desktop": "Desktop development: Tauri and desktop app practices",
+    "mobile": "Mobile development",
+    "games": "Reserved for future Unity3D and Unreal Engine packs. No skills yet"
+  },
+  "rules": {
+    "version": "local: date of the most recently changed file (YYYY-MM-DD). upstream: the version declared in SKILL.md, or commitDate when none is declared.",
+    "contentHash": "sha256 of the file list, one \"<git blob sha1> <path>\\n\" line per file, sorted by path. Paths are relative to the skill folder with forward slashes. Before hashing, text files have CRLF converted to LF; a file with a NUL byte in its first 8000 bytes is binary and hashed as is. The same value can be computed from a GitHub tree listing, leaving out any paths in omit.",
+    "update": [
+      "Check for changes: compare each upstream skill's commit with the newest commit touching source.path on source.branch. Declared versions are rarely bumped, so never decide by version.",
+      "Check for local edits: recompute contentHash before replacing a folder. A mismatch means edits that the update would overwrite.",
+      "Update upstream skills: replace the folder in ~/.agents/skills with source.path at the new commit, leaving out paths in omit, then set commit, commitDate, version and contentHash.",
+      "Update local skills: recompute contentHash. If it changed, store it and set version to the new update date.",
+      "Skip entries marked discontinued: there is no upstream to pull from.",
+      "Keep the list in sync: give any new folder that has a SKILL.md a pack and an entry, remove entries whose folder is gone, then set updatedAt.",
+      "After adding or removing a skill, run ~/.agents/link-skills.ps1 so Claude Code can discover it. Run it once on each new machine too."
+    ]
+  },
+  "skills": {
+    "desktop-app-best-practices": {
+      "origin": "local",
+      "pack": "desktop",
+      "version": "2026-11-01",
+      "contentHash": "sha256:ab90fab4b887a4bbc14453ed7e5cfbdf6ba73a034c41542ed28b7110e66d77fc"
+    },
+    "frontend-design": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "2026-09-03",
+      "source": {
+        "repo": "anthropics/skills",
+        "branch": "main",
+        "path": "skills/frontend-design"
+      },
+      "commit": "41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f",
+      "commitDate": "2026-09-03",
+      "contentHash": "sha256:d03bf673599dc972826b6a9ffcbe3848d16180263f4d243a9cdc6229ac4d4095"
+    },
+    "material-ui-nextjs": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "1.0.0",
+      "source": {
+        "repo": "mui/material-ui",
+        "branch": "master",
+        "path": "skills/material-ui-nextjs"
+      },
+      "commit": "00f2d81a83c283f6f26136d789242bb27beb2da7",
+      "commitDate": "2026-09-03",
+      "contentHash": "sha256:5ff2dcf22bfd9b0f0a55cc19de62e6089f84a09df25ccd98a2ec2030198ab848",
+      "omit": [
+        "metadata.json"
+      ]
+    },
+    "material-ui-styling": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "1.0.0",
+      "source": {
+        "repo": "mui/material-ui",
+        "branch": "master",
+        "path": "skills/material-ui-styling"
+      },
+      "commit": "0cb3c247c59d960e15216ebc4c2e12538b750804",
+      "commitDate": "2026-06-29",
+      "contentHash": "sha256:05241fdb36bc90c91a2e7ddd0700fa90f71075c591cd68df265c73c5f10dee0f",
+      "omit": [
+        "metadata.json"
+      ]
+    },
+    "material-ui-tailwind": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "1.0.0",
+      "source": {
+        "repo": "mui/material-ui",
+        "branch": "master",
+        "path": "skills/material-ui-tailwind"
+      },
+      "commit": "0cb3c247c59d960e15216ebc4c2e12538b750804",
+      "commitDate": "2026-06-29",
+      "contentHash": "sha256:91633dd5ab85318a3b519b5a28f3ea28dc3aa456e8dbfff85102d146b08e9e9f",
+      "omit": [
+        "metadata.json"
+      ]
+    },
+    "material-ui-theming": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "1.0.0",
+      "source": {
+        "repo": "mui/material-ui",
+        "branch": "master",
+        "path": "skills/material-ui-theming"
+      },
+      "commit": "0cb3c247c59d960e15216ebc4c2e12538b750804",
+      "commitDate": "2026-06-29",
+      "contentHash": "sha256:ead1e9a97eb6ff119105b5bd43251d538ede080f091f00b815a304e985aaf355",
+      "omit": [
+        "metadata.json"
+      ]
+    },
+    "next-best-practices": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "backend",
+      "version": "2026-05-04",
+      "source": {
+        "repo": "vercel-labs/next-skills",
+        "branch": "main",
+        "path": "skills/next-best-practices"
+      },
+      "commit": "34d5a7775ef1c49c0a656f810493c18af7948bbd",
+      "commitDate": "2026-05-04",
+      "contentHash": "sha256:487c83455249c12aab56336ea99ddddbe6842d72ff40243a34ffed4c03d5b499",
+      "discontinued": {
+        "date": "2026-06-17",
+        "reason": "Removed upstream. The knowledge now ships with Next.js 16.3+ through its bundled docs and the AGENTS.md / CLAUDE.md that next dev generates. This copy keeps working but gets no updates.",
+        "movedTo": "https://github.com/vercel/next.js/tree/canary/skills"
+      }
+    },
+    "openspec-code-practices": {
+      "origin": "local",
+      "pack": "core",
+      "version": "2026-11-01",
+      "contentHash": "sha256:463a622351de6bd05a93d42fd8f360e4fbcfc8de5d310f5332996f192544ecb2"
+    },
+    "phoxer": {
+      "origin": "local",
+      "pack": "core",
+      "version": "2026-11-01",
+      "contentHash": "sha256:f3423fe0833684a89876d11881de3970e15594b9daefed3b2ad425c33c6c37d8"
+    },
+    "pr-review": {
+      "origin": "local",
+      "pack": "core",
+      "version": "2026-11-01",
+      "contentHash": "sha256:b5aecddaaff691a52d885823565b870796e889f26e197a18db4ffa5c2c8eb501"
+    },
+    "rebase-and-pr": {
+      "origin": "local",
+      "pack": "core",
+      "version": "2026-10-31",
+      "contentHash": "sha256:113f212f385a841874892519ec4ce61c7ca42be14aead70b17ccee028e8c1fa0"
+    },
+    "tauri-best-practices": {
+      "origin": "local",
+      "pack": "desktop",
+      "version": "2026-11-01",
+      "contentHash": "sha256:a29df467247fa9ad294e799ccde9d71ab7bf9038130082f068e7baeb9f41fafd"
+    },
+    "vercel-composition-patterns": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "1.0.0",
+      "source": {
+        "repo": "vercel-labs/agent-skills",
+        "branch": "main",
+        "path": "skills/composition-patterns"
+      },
+      "commit": "a5343bd997c4cc4d8bf2ca61021bdc74b4d6c9d5",
+      "commitDate": "2026-01-28",
+      "contentHash": "sha256:ee8e41ef082a12d30657866fde50617e7fef69a0a17678cb5a52677aaf726394"
+    },
+    "vercel-react-best-practices": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "1.0.0",
+      "source": {
+        "repo": "vercel-labs/agent-skills",
+        "branch": "main",
+        "path": "skills/react-best-practices"
+      },
+      "commit": "dc8367e6f91c022d83361f03c3313fa05e848ee5",
+      "commitDate": "2026-04-14",
+      "contentHash": "sha256:4f5ab5d4ab601f05e642ac13fbec92551f385e767449bcaba9cf87701dbaccd2"
+    },
+    "vercel-react-native-skills": {
+      "origin": "upstream",
+      "pack": "mobile",
+      "version": "1.0.0",
+      "source": {
+        "repo": "vercel-labs/agent-skills",
+        "branch": "main",
+        "path": "skills/react-native-skills"
+      },
+      "commit": "485beb804924eb4d96ea99e88a44439039c1ab5e",
+      "commitDate": "2026-01-27",
+      "contentHash": "sha256:5c8322cb1a97fe93bd528fadf5a9bf49b1b3f4f9b222041d2f6d8bf823c28f78"
+    },
+    "vercel-react-view-transitions": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "1.0.0",
+      "source": {
+        "repo": "vercel-labs/agent-skills",
+        "branch": "main",
+        "path": "skills/react-view-transitions"
+      },
+      "commit": "6ec269328bc400712ee225a173a14b6b29128df7",
+      "commitDate": "2026-10-27",
+      "contentHash": "sha256:06788046b2d79b3182b8ac5951bb8c852d57e7943c5f89c364fc69e04c999bf1"
+    },
+    "web-artifacts-builder": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "2026-04-20",
+      "source": {
+        "repo": "anthropics/skills",
+        "branch": "main",
+        "path": "skills/web-artifacts-builder"
+      },
+      "commit": "b9e19e6f44773509fbdd7001d77ff41a49a486c1",
+      "commitDate": "2026-04-20",
+      "contentHash": "sha256:1abfd2d4ed7a19beaced495552a1edd2d4d864d3726015483a40cf49ddace40d"
+    },
+    "web-design-guidelines": {
+      "origin": "upstream",
+      "pack": "web",
+      "area": "frontend",
+      "version": "1.0.0",
+      "source": {
+        "repo": "vercel-labs/agent-skills",
+        "branch": "main",
+        "path": "skills/web-design-guidelines"
+      },
+      "commit": "ba46938889d4e58635362fb8f618e1178ac3ec46",
+      "commitDate": "2026-01-16",
+      "contentHash": "sha256:9802495019335d96492191473fb78cd9729f8acc6279e55310e8446661cf3b9f"
+    }
+  }
+}
