@@ -1,7 +1,7 @@
 {
   "lockfileVersion": 2,
   "updatedAt": "2026-11-01",
-  "location": "Real skill folders live in ~/.agents/skills. ~/.claude/skills holds one junction per skill, made by ~/.agents/link-skills.ps1, plus the app-managed synced and .trash folders, which are not registered here.",
+  "location": "Real skill folders live in ~/.agents/skills. ~/.claude/skills and ~/.copilot/skills each hold one junction per skill, made by ~/.agents/link-skills.ps1. ~/.claude/skills also has the app-managed synced and .trash folders, which are not registered here.",
   "packs": {
     "core": "Workflow skills that apply to every project",
     "web": "Web development: frontend and backend",
@@ -19,7 +19,7 @@
       "Update local skills: recompute contentHash. If it changed, store it and set version to the new update date.",
       "Skip entries marked discontinued: there is no upstream to pull from.",
       "Keep the list in sync: give any new folder that has a SKILL.md a pack and an entry, remove entries whose folder is gone, then set updatedAt.",
-      "After adding or removing a skill, run ~/.agents/link-skills.ps1 so Claude Code can discover it. Run it once on each new machine too."
+      "After adding or removing a skill, run ~/.agents/link-skills.ps1 so Claude Code and GitHub Copilot can discover it. Run it once on each new machine too."
     ]
   },
   "skills": {
