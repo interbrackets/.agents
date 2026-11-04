@@ -6,13 +6,13 @@ argument-hint: '<PR number | #id | owner/repo#id | PR URL>'
 
 # PR Review
 
-Rebuild a pull request's context on a machine that did not write it, then review it the way a fresh reviewer would. The author is usually the user, working on another machine. So the first job is a handoff: what was done, why, and where it stopped. The second is an honest review: what is wrong or risky in the diff. Both come from two sources only: the PR description and the full diff.
+Rebuild a pull request's context on a machine that did not write it, then review it the way a fresh reviewer would. The author is usually the user, working on another machine. So the first job is a handoff: what was done, why, and where it stopped. The second is an honest review: what is wrong or risky in the diff. The PR description and the full diff are the subject; anything else you read is there to check what they claim.
 
 ## Ground rules
 
 - **Read-only.** Do not `git fetch`, `git checkout`, `gh pr checkout`, stash, or edit files. Do not comment, review, approve, label or merge on GitHub. Read the PR through `gh`. Touch the local clone only with read-only commands (`git status`, `git rev-parse`, `git cat-file`, `git remote`). If the user wants to continue the work here, give them the command and do not run it.
-- **Two sources.** Read the PR description and the diff. Do not pull conversation comments, review threads, commit history, CI results or linked issues unless the user asks for them. You may read whole files at the PR head to understand a hunk (step 3). That still counts as reading the diff, not a new source.
-- **Evidence over memory.** Every statement in the report must point to the description or to a `path:line` in the diff. If the two sources cannot answer something, write "unknown from the PR" instead of guessing.
+- **Review the PR, verify its claims.** Read the PR description and the diff in full. Beyond them, read only what a finding would hinge on: whole files at the PR head or base (step 3), and the source of a dependency when the PR states how that dependency behaves (step 4). Do not pull conversation comments, review threads, commit history, CI results or linked issues unless the user asks for them; they describe the PR rather than check it.
+- **Evidence over memory.** Every statement in the report must point to the description, to a `path:line` in the diff, or to the file you read to check a claim. If none of these can answer something, write "unknown from the PR" instead of guessing.
 
 ## 1. Resolve the argument
 
@@ -78,6 +78,8 @@ Work in this order. The handoff depends on understanding the changes, and the re
 
 **Compare the description with the diff.** For each claim in the description, find it in the diff and mark it as matched, partial or missing. For each significant change in the diff, check whether the description mentions it. Unmentioned changes (drive-by edits, leftover debug code, reformatting of unrelated files) are where handoff surprises hide.
 
+**Check the claims the change rests on.** Designs, comments and descriptions often state how something outside the diff behaves: "the plugin returns an error on invalid JSON", "`main` already allows X", "this API is idempotent", "verified in the v2 source". When the correctness of the change depends on such a statement, check it rather than trusting it. That is where a reviewer adds the most, because the author's mistake there is invisible in the diff. Read the code at the version the PR targets: the repo at `<baseRefOid>` for claims about current state, and the dependency's own repository at the pinned or stated version for claims about a library (for example `gh api "repos/<org>/<dep-repo>/contents/<path>?ref=<tag>" -H "Accept: application/vnd.github.raw"`). Cite what you read as `<repo>/<path>:<line>@<ref>`. Check the few claims a design is built on, not every sentence; if a claim cannot be checked (no public source, unclear version), put it under **Questions for the author**.
+
 **Find where the work stopped.** These signals mean the work is unfinished:
 
 - the PR is a draft
@@ -93,7 +95,7 @@ Work in this order. The handoff depends on understanding the changes, and the re
 - **Correctness.** Logic errors, wrong conditions, off-by-one errors, unhandled null, undefined or error paths, race conditions, and broken async such as a missing `await` or an unhandled promise.
 - **Contracts.** Signatures, exports or config that changed without updating their callers, and removed things that are still referenced.
 - **Security.** Input that reaches a query, HTML, URL, shell or `eval`. Secrets in code or in public environment variables. Permissions or CSP that got looser.
-- **Tests.** Behavior that changed with no test change, and tests that cannot fail.
+- **Tests.** Behavior that changed with no test change, and tests that cannot fail. In a planning or spec PR, treat verification tasks, probes and scenarios as the tests: a probe that only exercises the easy case (a missing file when the risk is an existing one), or a check that cannot pass at the point the task list runs it, is a finding.
 - **Leftovers.** Debug logs, `.only`, commented-out blocks, and hardcoded local paths, usernames or machine names. These are common when the work was done on another machine.
 - **Dependencies.** New packages, major version bumps, and a lockfile that disagrees with the manifest.
 
@@ -114,7 +116,7 @@ Move anything with confidence below 6 to **Questions for the author**. Skip styl
 
 ## 5. Relate the PR to this machine (read-only)
 
-This step applies only when the shell is in a clone of the same repo (`git remote get-url origin` matches `<owner>/<repo>`):
+This step applies only when the shell is in a clone of the same repo (`git remote get-url origin` matches `<owner>/<repo>`). Otherwise skip it and leave the **This machine** line out of the report:
 
 ```bash
 git rev-parse --abbrev-ref HEAD
@@ -133,38 +135,43 @@ Suggest the command to continue, `gh pr checkout <n> --repo <owner>/<repo>`, but
 
 ## 6. Report in chat
 
-Size the report to the PR; a four-line docs change gets a short report. Link each `path:line` to `https://github.com/<owner>/<repo>/blob/<headRefOid>/<path>#L<line>` so it opens the exact version you reviewed. Take line numbers from the new side of the hunk header: in `@@ -a,b +c,d @@`, the first new line is `c`.
+The reader wrote this PR, or will act on it, and wants two things fast: where to pick up, and what is wrong. Everything else is support for those two. So:
+
+- **Spend words on findings, not on context.** The author already knows what they meant to do; the handoff reminds them in a few lines and the findings carry the detail. Length scales with the number and weight of findings, not with the size of the diff. A 1,600-line PR with three findings still gets a short report; aim for a few hundred words of context at most.
+- **Report differences, not agreement.** Do not restate the description back to the author, list everything that matched, or enumerate the public surface item by item. Mention a change only when it is a surprise, a risk, or needed to follow a finding.
+- **Leave out empty sections.** A section that would say "none", "not applicable", or list sources you deliberately did not read is noise. Drop it.
+
+Link each `path:line` to `https://github.com/<owner>/<repo>/blob/<headRefOid>/<path>#L<line>` so it opens the exact version you reviewed. Take line numbers from the new side of the hunk header: in `@@ -a,b +c,d @@`, the first new line is `c`.
 
 ```markdown
 ## PR #<n> — <title>
 <state>[, draft] · `<head>` → `<base>` · @<author> · +<additions> −<deletions> in <changedFiles> files · head `<sha7>`
 <url>
 
-### Context handoff
-**Intent:** one or two sentences, in the author's terms.
-**What changed:** bullets grouped by concern, each with its key files.
-**State:** done, in progress, or blocked, with the evidence.
-**Pick up here:** concrete next steps, drawn from Follow-ups, TODOs, unchecked tasks and the findings below.
-**This machine:** branch and HEAD compared with the PR head, dirty files, and the command to continue.
+### Pick up here
+**Intent:** one sentence, in the author's terms.
+**What changed:** one line per concern with its key path; no sub-bullets.
+**State:** done, in progress, or blocked, with the evidence (draft flag, unchecked tasks, TODOs).
+**Next:** 2–5 concrete steps, drawn from Follow-ups, unchecked tasks and the findings below.
+**This machine:** (only when step 5 ran) branch and HEAD against the PR head, dirty files, the command to continue.
 
-### Review findings
+### Findings
 | # | Severity | File:line | Finding | Confidence |
 |---|---|---|---|---|
 
-For each finding: what is wrong, why it matters, and a suggested fix (a short snippet when that is clearer).
-If there are none, write "No findings" and list what was checked. Do not invent findings.
+For each finding, a short paragraph: what is wrong, why it matters, the fix (a snippet only when the fix is code and a snippet is clearer than a sentence).
+If there are none, write "No findings" and one line on what was checked. Do not invent findings.
 
 ### Description vs diff
-- Matched: …
-- Partial: …
-- Missing (claimed, not in the diff): …
-- Unmentioned (in the diff, not claimed): …
+(only when something differs)
+- Partial or missing: claims the diff does not fully back.
+- Unmentioned: significant changes the description does not name.
 
 ### Questions for the author
-- what the PR does not answer, including findings below the confidence threshold
+(only when there are any) what the PR does not answer, including findings below the confidence threshold and claims you could not check.
 
 ### Not reviewed
-- skipped generated or oversized files, and the sources deliberately not read (comments, reviews, commits, CI, linked issues)
+(only when you skipped something) files skipped for size or as generated, naming each.
 ```
 
 Delete any temp files you created. Leave out narration of steps that went as expected.
